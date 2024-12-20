@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Manager with Libraries</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        textarea, button, input {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        textarea {
+            width: 90%;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bot Manager with Libraries</h1>
+    <textarea id="botCode" placeholder="Enter your bot code here..."></textarea><br>
+    <input type="file" id="packageJson" accept=".json"><br>
+    <button id="startBot">Start Bot</button>
+    <button id="stopBot">Stop Bot</button>
+    <button id="runBot">Run Bot</button>
+
+    <script>
+        const startBotButton = document.getElementById("startBot");
+        const stopBotButton = document.getElementById("stopBot");
+        const runBotButton = document.getElementById("runBot");
+
+        // Start bot with uploaded code and package.json
+        startBotButton.addEventListener("click", async () => {
+            const code = document.getElementById("botCode").value;
+            const packageJsonInput = document.getElementById("packageJson");
+
+            if (!code) {
+                alert("Please enter bot code before starting!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("code", code);
+
+            if (packageJsonInput.files[0]) {
+                formData.append("packageJson", packageJsonInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/api/start-bot', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                console.error(error);
+                alert("Failed to start the bot!");
+            }
+        });
+
+        // Stop the bot
+        stopBotButton.addEventListener("click", async () => {
+            try {
+                const response = await fetch('/api/stop-bot', { method: 'POST' });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                console.error(error);
+                alert("Failed to stop the bot!");
+            }
+        });
+
+        // Run the bot directly (without uploading new code)
+        runBotButton.addEventListener("click", async () => {
+            try {
+                const response = await fetch('/api/run-bot', { method: 'POST' });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                console.error(error);
+                alert("Failed to run the bot!");
+            }
+        });
+    </script>
+</body>
+</html>
